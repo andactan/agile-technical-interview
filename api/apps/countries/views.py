@@ -1,7 +1,7 @@
 from rest_framework import viewsets, mixins, permissions
 from apps.countries.models import Country, Province
 from apps.countries.serializers import CountrySerializer, ProvinceSerializer
-from apps.countries.filters import CountryFilter
+from apps.countries.filters import CountryFilter, ProvinceFilter
 
 
 class AbstractView(
@@ -26,3 +26,4 @@ class ProvinceView(AbstractView):
     queryset = Province.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = ProvinceSerializer
+    filterset_class = ProvinceFilter

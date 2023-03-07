@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from apps.countries.views import CountryView, ProvinceView
 
 
-router = DefaultRouter()
+router = DefaultRouter(trailing_slash=False)
 router.register(r"countries", CountryView)
 router.register(r"provinces", ProvinceView)
 

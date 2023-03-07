@@ -30,3 +30,5 @@ class CountryFilter(filters.FilterSet):
 
 class ProvinceFilter(filters.FilterSet):
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")
+    country__name = filters.CharFilter(field_name="country__name", lookup_expr="exact")
+    country__id = filters.NumberFilter(field_name="country__id")
