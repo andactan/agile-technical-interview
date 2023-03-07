@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     # plugins
     "drf_yasg",
     "rest_framework",
+    # custom
+    "apps.countries",
 ]
 
 MIDDLEWARE = [
