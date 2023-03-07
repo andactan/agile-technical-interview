@@ -1,9 +1,10 @@
 from rest_framework import viewsets, mixins, permissions
-from apps.countries.models import Country
-from apps.countries.serializers import CountrySerializer
+from apps.countries.models import Country, Province
+from apps.countries.serializers import CountrySerializer, ProvinceSerializer
+from apps.countries.filters import CountryFilter
 
 
-class CountryView(
+class AbstractView(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -11,6 +12,17 @@ class CountryView(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
+    ...
+
+
+class CountryView(AbstractView):
     queryset = Country.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = CountrySerializer
+    filterset_class = CountryFilter
+
+
+class ProvinceView(AbstractView):
+    queryset = Province.objects.all()
+    permission_classes = [permissions.AllowAny]
+    serializer_class = ProvinceSerializer
