@@ -5,7 +5,7 @@ from apps.countries.models import Country
 class CountryFilter(filters.FilterSet):
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")
     continent = filters.CharFilter(field_name="continent", lookup_expr="iexact")
-    province = filters.CharFilter(field_name="country__provinces__name", lookup_expr="icontains")
+    # province = filters.CharFilter(field_name="country__provinces__name", lookup_expr="icontains")
     population__gte = filters.NumberFilter(field_name="population", lookup_expr="gte")
     population__lte = filters.NumberFilter(field_name="population", lookup_expr="lte")
     fertility_rate__gte = filters.NumberFilter(field_name="fertility_rate", lookup_expr="gte")
