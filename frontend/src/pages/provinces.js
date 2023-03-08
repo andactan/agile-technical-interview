@@ -20,7 +20,7 @@ export default function Provinces() {
   React.useEffect(() => {
     ProvinceService.getAll({ params: { country__id: countryId } })
       .then((response) => {
-        setProvinces(response.data);
+        setProvinces(response.data.results);
       })
       .catch((error) => {
         console.log(error);

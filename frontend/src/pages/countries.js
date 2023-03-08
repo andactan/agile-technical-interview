@@ -2,6 +2,7 @@ import React from "react";
 import CountryService from "../services/country-service";
 import {
   Button,
+  Checkbox,
   FormControl,
   Grid,
   IconButton,
@@ -38,6 +39,7 @@ function SortableTableHead(props) {
   return (
     <TableHead component="div">
       <TableRow component="div">
+        <TableCell padding="checkbox" component="div" />
         {fields.map((field) => {
           const found = orderBy.find((e) => e.label === field);
           return (
@@ -89,6 +91,7 @@ export default function Countries() {
     }
   };
 
+  // filters
   const [continent, setContinent] = React.useState("All");
   const [population, setPopulation] = React.useState("All");
   const [medianAge, setMedianAge] = React.useState("All");
@@ -107,6 +110,65 @@ export default function Countries() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  // selected elements
+  const [selectedRows, setSelectedRows] = React.useState([]);
+  const handleCheckboxClick = (event, rowId) => {
+    const idx = selectedRows.indexOf(rowId);
+    let newSelectedRows = [];
+
+    if (idx === -1) {
+      newSelectedRows = [...selectedRows, rowId];
+    } else if (idx === 0) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(1));
+    } else if (idx === selectedRows.length - 1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, -1));
+    } else if (idx > 0) {
+      newSelectedRows = newSelectedRows.concat(
+        selectedRows.slice(0, idx),
+        selectedRows.slice(idx + 1)
+      );
+    }
+
+    setSelectedRows(newSelectedRows);
+  };
+
+  const [reload, setReload] = React.useState(false);
+  const handleDeleteButtonClick = () => {
+    const promises = selectedRows.map((row) => {
+      return CountryService.delete(row)
+        .then((response) => {
+          return response;
+        })
+        .catch((error) => {
+          return Promise.reject(error);
+        });
+    });
+
+    Promise.all(promises)
+      .then((responses) => {
+        console.log(responses);
+      })
+      .catch((errors) => {
+        console.log(errors);
+      })
+      .finally(() => {
+        setReload((old) => !old);
+      });
+  };
+
+  const [continents, setContinents] = React.useState([]);
+  React.useEffect(() => {
+    CountryService.getAll()
+      .then((response) => {
+        const results = response.data.results;
+        const continents = new Set(results.map((result) => result.continent));
+        setContinents([...continents]);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [reload]);
 
   React.useEffect(() => {
     const _orderBy = orderBy.map((order) => {
@@ -154,19 +216,8 @@ export default function Countries() {
     fertilityRate,
     page,
     rowsPerPage,
+    reload,
   ]);
-
-  const [continents, setContinents] = React.useState([]);
-  React.useEffect(() => {
-    CountryService.getAll()
-      .then((response) => {
-        const results = response.data.results;
-        setContinents(results.map((result) => result.continent));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
 
   return (
     <div style={{ maxWidth: "100vw" }}>
@@ -270,6 +321,7 @@ export default function Countries() {
               sx={{ height: "100%" }}
               variant="contained"
               startIcon={<DeleteIcon />}
+              onClick={handleDeleteButtonClick}
             >
               Delete
             </Button>
@@ -289,22 +341,42 @@ export default function Countries() {
               return (
                 <TableRow
                   key={country.id}
-                  component={Link}
-                  to={`/countries/${country.id}`}
                   sx={{ textDecoration: "none" }}
+                  component="div"
                 >
-                  {fields.map((field) => {
-                    return (
-                      <TableCell
-                        key={`${country.id}-${field}`}
-                        component="div"
-                        align="left"
-                        sx={{ paddingLeft: "42px" }}
-                      >
-                        {country[field]}
-                      </TableCell>
-                    );
-                  })}
+                  <TableCell padding="checkbox" component="div">
+                    <Checkbox
+                      color="primary"
+                      checked={selectedRows.indexOf(country.id) !== -1}
+                      onChange={(event) =>
+                        handleCheckboxClick(event, country.id)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell
+                    key={`${country.id}-${"name"}`}
+                    component="div"
+                    align="left"
+                    sx={{ paddingLeft: "42px" }}
+                  >
+                    <Link to={`/countries/${country.id}`}>
+                      {country["name"]}
+                    </Link>
+                  </TableCell>
+                  {fields
+                    .filter((e) => e !== "name")
+                    .map((field) => {
+                      return (
+                        <TableCell
+                          key={`${country.id}-${field}`}
+                          component="div"
+                          align="left"
+                          sx={{ paddingLeft: "42px" }}
+                        >
+                          {country[field]}
+                        </TableCell>
+                      );
+                    })}
                 </TableRow>
               );
             })}
