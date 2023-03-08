@@ -176,17 +176,13 @@ export default function Countries() {
     setName(searchText);
   };
 
-  React.useEffect(() => {
-    const _orderBy = orderBy.map((order) => {
-      return order.direction === "asc" ? order.label : `-${order.label}`;
-    });
+  const handleExportButtonClick = () => {
+    const params = createQueryParams();
+    CountryService.exportToCSV({ params: params });
+  };
 
-    let params = {
-      order: _orderBy.join(","),
-      page: page + 1,
-      page_size: rowsPerPage,
-    };
-
+  const createQueryParams = React.useCallback(() => {
+    let params = {};
     if (name !== "") {
       params = { ...params, name: name };
     }
@@ -210,6 +206,21 @@ export default function Countries() {
       params[filterKey] = parseInt(filterValue, 10);
     }
 
+    return params;
+  }, [name, continent, population, fertilityRate, medianAge]);
+
+  React.useEffect(() => {
+    const _orderBy = orderBy.map((order) => {
+      return order.direction === "asc" ? order.label : `-${order.label}`;
+    });
+
+    let params = {
+      order: _orderBy.join(","),
+      page: page + 1,
+      page_size: rowsPerPage,
+      ...createQueryParams(),
+    };
+
     CountryService.getAll({ params: params })
       .then((response) => {
         setCountries(response.data.results);
@@ -218,17 +229,7 @@ export default function Countries() {
       .catch((error) => {
         console.log(error);
       });
-  }, [
-    orderBy,
-    continent,
-    population,
-    medianAge,
-    fertilityRate,
-    name,
-    page,
-    rowsPerPage,
-    reload,
-  ]);
+  }, [orderBy, page, rowsPerPage, reload, createQueryParams]);
 
   return (
     <div style={{ maxWidth: "100vw" }}>
@@ -330,6 +331,7 @@ export default function Countries() {
               sx={{ height: "100%" }}
               variant="contained"
               startIcon={<DownloadIcon />}
+              onClick={handleExportButtonClick}
             >
               Export to CSV
             </Button>

@@ -46,4 +46,23 @@ export default class CountryService {
         return Promise.reject(error.response);
       });
   }
+
+  static async exportToCSV({ params = null } = {}) {
+    return axios
+      .get(`${this.URL}/export_to_csv`, {
+        params: params,
+        responseType: "blob",
+      })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "export.csv");
+        document.body.appendChild(link);
+        link.click();
+      })
+      .catch((error) => {
+        return Promise.reject(error.response);
+      });
+  }
 }

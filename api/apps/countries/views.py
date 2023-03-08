@@ -30,10 +30,12 @@ class CountryView(AbstractView):
         response["Content-Disposition"] = 'attachment; filename="export.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(["first_name", "last_name", "phone_number", "country"])
-        writer.writerow(["Huzaif", "Sayyed", "+919954465169", "India"])
-        writer.writerow(["Adil", "Shaikh", "+91545454169", "India"])
-        writer.writerow(["Ahtesham", "Shah", "+917554554169", "India"])
+        writer.writerow(["id", "name", "continent", "population"])
+
+        # get filtered queryset, then export
+        filtered_qs = self.filterset_class(self.request.GET, self.get_queryset()).qs
+        for country in filtered_qs.values_list("id", "name", "continent", "population"):
+            writer.writerow(country)
 
         return response
 
