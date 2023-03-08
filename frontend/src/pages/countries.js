@@ -170,6 +170,12 @@ export default function Countries() {
       });
   }, [reload]);
 
+  const [searchText, setSearchText] = React.useState("");
+  const [name, setName] = React.useState("");
+  const handleSearchClick = () => {
+    setName(searchText);
+  };
+
   React.useEffect(() => {
     const _orderBy = orderBy.map((order) => {
       return order.direction === "asc" ? order.label : `-${order.label}`;
@@ -180,6 +186,10 @@ export default function Countries() {
       page: page + 1,
       page_size: rowsPerPage,
     };
+
+    if (name !== "") {
+      params = { ...params, name: name };
+    }
 
     if (continent !== "All" && continent !== "") {
       params = { ...params, continent: continent };
@@ -214,6 +224,7 @@ export default function Countries() {
     population,
     medianAge,
     fertilityRate,
+    name,
     page,
     rowsPerPage,
     reload,
@@ -298,11 +309,19 @@ export default function Countries() {
 
           <Grid item xs={4}>
             <FormControl fullWidth>
-              <TextField label="Search by country" />
+              <TextField
+                label="Search by country"
+                value={searchText}
+                onChange={(event) => setSearchText(event.target.value)}
+              />
             </FormControl>
           </Grid>
           <Grid item>
-            <Button sx={{ height: "100%" }} variant="contained">
+            <Button
+              sx={{ height: "100%" }}
+              variant="contained"
+              onClick={handleSearchClick}
+            >
               <SearchIcon />
             </Button>
           </Grid>
