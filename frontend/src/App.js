@@ -14,12 +14,14 @@ function App() {
   //     foo();
   //   }, []);
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Countries />} exact />
-        <Route path="/countries/:countryId" element={<Provinces />} exact />
-      </Routes>
-    </BrowserRouter>
+    <div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Countries />} exact />
+          <Route path="/countries/:countryId" element={<Provinces />} exact />
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }
 

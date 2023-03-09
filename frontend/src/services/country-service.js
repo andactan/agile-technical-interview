@@ -47,6 +47,17 @@ export default class CountryService {
       });
   }
 
+  static async post({ params = null } = {}) {
+    return axios
+      .post(`${this.URL}`, { ...params })
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   static async exportToCSV({ params = null } = {}) {
     return axios
       .get(`${this.URL}/export_to_csv`, {

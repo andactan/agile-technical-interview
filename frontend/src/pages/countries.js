@@ -3,6 +3,7 @@ import CountryService from "../services/country-service";
 import {
   Button,
   Checkbox,
+  Collapse,
   FormControl,
   Grid,
   IconButton,
@@ -20,14 +21,71 @@ import {
   TableRow,
   TableSortLabel,
   TextField,
+  Typography,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { toTitle } from "../utils";
 import SearchIcon from "@mui/icons-material/Search";
 import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
+import SaveIcon from "@mui/icons-material/Save";
 import EditableTableRow from "./editable-table-row";
+import HeaderGroup from "./header-group";
+
+function Create(props) {
+  const fields = props.fields;
+  const protoData = Object.fromEntries(fields.map((field) => [field, ""]));
+  const [data, setData] = React.useState(protoData);
+
+  const handleOnChange = (event, key) => {
+    const newData = { ...data };
+    newData[key] = event.target.value;
+
+    setData({ ...newData });
+  };
+
+  const handleSaveClick = () => {
+    CountryService.post({ params: data })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    setData({ ...protoData });
+  };
+
+  return (
+    <Grid container spacing={1}>
+      {fields.map((field) => {
+        return (
+          <Grid key={field} item>
+            <FormControl fullWidth>
+              <TextField
+                key={field}
+                label={toTitle(field)}
+                value={data[field]}
+                onChange={(event) => handleOnChange(event, field)}
+              ></TextField>
+            </FormControl>
+          </Grid>
+        );
+      })}
+      <Grid item>
+        <Button
+          variant="contained"
+          startIcon={<SaveIcon />}
+          sx={{ height: "100%" }}
+          onClick={handleSaveClick}
+        >
+          Save
+        </Button>
+      </Grid>
+    </Grid>
+  );
+}
 
 function SortableTableHead(props) {
   const fields = props.fields;
@@ -184,6 +242,30 @@ export default function Countries() {
     CountryService.exportToCSV({ params: params });
   };
 
+  // collapsible
+  const [collapseIn, setCollapseIn] = React.useState(false);
+  const handleAddButtonClick = () => {
+    setCollapseIn((collapse) => !collapse);
+  };
+
+  const headerGroupProps = {
+    continents: continents,
+    continent: continent,
+    setContinent: setContinent,
+    population: population,
+    setPopulation: setPopulation,
+    medianAge: medianAge,
+    setMedianAge: setMedianAge,
+    fertilityRate: fertilityRate,
+    setFertilityRate: setFertilityRate,
+    searchText: searchText,
+    setSearchText: setSearchText,
+    handleSearchClick: handleSearchClick,
+    handleExportButtonClick: handleExportButtonClick,
+    handleDeleteButtonClick: handleDeleteButtonClick,
+    handleAddButtonClick: handleAddButtonClick,
+  };
+
   const createQueryParams = React.useCallback(() => {
     let params = {};
     if (name !== "") {
@@ -234,127 +316,26 @@ export default function Countries() {
       });
   }, [orderBy, page, rowsPerPage, reload, createQueryParams]);
 
-  //   console.log(selectedRows);
-
   return (
     <div style={{ maxWidth: "100vw" }}>
-      <Paper sx={{ padding: "20px", marginBottom: "10px" }}>
-        <Grid container spacing={1}>
-          <Grid item xs>
-            <FormControl fullWidth>
-              <InputLabel id="continent-label">Continent</InputLabel>
-              <Select
-                labelId="continent-label"
-                id="continent-select"
-                label="Continent"
-                value={continent}
-                onChange={(event) => setContinent(event.target.value)}
-              >
-                <MenuItem value={"All"}>All</MenuItem>
-                {continents.map((continent) => (
-                  <MenuItem value={continent}>{continent}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs>
-            <FormControl fullWidth>
-              <InputLabel id="population-label">Population</InputLabel>
-              <Select
-                labelId="population-label"
-                id="population-select"
-                label="Population"
-                value={population}
-                onChange={(event) => setPopulation(event.target.value)}
-              >
-                <MenuItem value={"All"}>All</MenuItem>
-                <MenuItem value={"population__lte-100000000"}>
-                  {"< 100 million"}
-                </MenuItem>
-                <MenuItem value={"population__gte-100000000"}>
-                  {"> 100 million"}
-                </MenuItem>
-                <MenuItem value={"population__gte-1000000000"}>
-                  {"> 1 billion"}
-                </MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs>
-            <FormControl fullWidth>
-              <InputLabel id="median-age-label">Median Age</InputLabel>
-              <Select
-                labelId="median-age-label"
-                id="median-age-select"
-                label="Median Age"
-                value={medianAge}
-                onChange={(event) => setMedianAge(event.target.value)}
-              >
-                <MenuItem value={"All"}>All</MenuItem>
-                <MenuItem value={"median_age__lte-45"}>{"< 45"}</MenuItem>
-                <MenuItem value={"median_age__gte-45"}>{"> 45"}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs>
-            <FormControl fullWidth>
-              <InputLabel id="fertility-rate-label">Fertility Rate</InputLabel>
-              <Select
-                labelId="fertility-rate-label"
-                id="fertility-rate-select"
-                label="Fertility Rate"
-                value={fertilityRate}
-                onChange={(event) => setFertilityRate(event.target.value)}
-              >
-                <MenuItem value={"All"}>All</MenuItem>
-                <MenuItem value={"fertility_rate__lte-1.5"}>{"< 1.5"}</MenuItem>
-                <MenuItem value={"fertility_rate__gte-1.5"}>{"> 1.5"}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={4}>
-            <FormControl fullWidth>
-              <TextField
-                label="Search by country"
-                value={searchText}
-                onChange={(event) => setSearchText(event.target.value)}
-              />
-            </FormControl>
-          </Grid>
-          <Grid item>
-            <Button
-              sx={{ height: "100%" }}
-              variant="contained"
-              onClick={handleSearchClick}
-            >
-              <SearchIcon />
-            </Button>
-          </Grid>
-          <Grid item xs={"auto"}>
-            <Button
-              sx={{ height: "100%" }}
-              variant="contained"
-              startIcon={<DownloadIcon />}
-              onClick={handleExportButtonClick}
-            >
-              Export to CSV
-            </Button>
-          </Grid>
-
-          <Grid item xs={"auto"}>
-            <Button
-              sx={{ height: "100%" }}
-              variant="contained"
-              startIcon={<DeleteIcon />}
-              onClick={handleDeleteButtonClick}
-            >
-              Delete
-            </Button>
-          </Grid>
-        </Grid>
-      </Paper>
+      {/* filters start */}
+      <HeaderGroup {...headerGroupProps} />
       {/* filters end */}
+      <Collapse in={collapseIn}>
+        <Paper
+          sx={{
+            marginTop: "5px",
+            marginBottom: "10px",
+            paddingBottom: "10px",
+            paddingLeft: "20px",
+          }}
+        >
+          <Typography sx={{ marginBottom: "5px" }}>
+            Add a new country
+          </Typography>
+          <Create fields={fields} />
+        </Paper>
+      </Collapse>
       <TableContainer component={Paper}>
         <Table aria-label="countries-table" component="div">
           <SortableTableHead
@@ -366,6 +347,7 @@ export default function Countries() {
             {countries.map((country) => {
               return (
                 <EditableTableRow
+                  key={country.id}
                   data={country}
                   fields={fields}
                   handleCheckboxClick={handleCheckboxClick}
