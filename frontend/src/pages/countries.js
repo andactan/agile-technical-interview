@@ -26,6 +26,8 @@ import { toTitle } from "../utils";
 import SearchIcon from "@mui/icons-material/Search";
 import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import EditableTableRow from "./editable-table-row";
 
 function SortableTableHead(props) {
   const fields = props.fields;
@@ -59,6 +61,7 @@ function SortableTableHead(props) {
             </TableCell>
           );
         })}
+        <TableCell component="div" />
       </TableRow>
     </TableHead>
   );
@@ -231,6 +234,8 @@ export default function Countries() {
       });
   }, [orderBy, page, rowsPerPage, reload, createQueryParams]);
 
+  //   console.log(selectedRows);
+
   return (
     <div style={{ maxWidth: "100vw" }}>
       <Paper sx={{ padding: "20px", marginBottom: "10px" }}>
@@ -360,45 +365,12 @@ export default function Countries() {
           <TableBody component="div">
             {countries.map((country) => {
               return (
-                <TableRow
-                  key={country.id}
-                  sx={{ textDecoration: "none" }}
-                  component="div"
-                >
-                  <TableCell padding="checkbox" component="div">
-                    <Checkbox
-                      color="primary"
-                      checked={selectedRows.indexOf(country.id) !== -1}
-                      onChange={(event) =>
-                        handleCheckboxClick(event, country.id)
-                      }
-                    />
-                  </TableCell>
-                  <TableCell
-                    key={`${country.id}-${"name"}`}
-                    component="div"
-                    align="left"
-                    sx={{ paddingLeft: "42px" }}
-                  >
-                    <Link to={`/countries/${country.id}`}>
-                      {country["name"]}
-                    </Link>
-                  </TableCell>
-                  {fields
-                    .filter((e) => e !== "name")
-                    .map((field) => {
-                      return (
-                        <TableCell
-                          key={`${country.id}-${field}`}
-                          component="div"
-                          align="left"
-                          sx={{ paddingLeft: "42px" }}
-                        >
-                          {country[field]}
-                        </TableCell>
-                      );
-                    })}
-                </TableRow>
+                <EditableTableRow
+                  data={country}
+                  fields={fields}
+                  handleCheckboxClick={handleCheckboxClick}
+                  isSelected={selectedRows.indexOf(country.id) !== -1}
+                />
               );
             })}
           </TableBody>
