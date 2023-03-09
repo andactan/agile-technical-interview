@@ -34,3 +34,15 @@ class ProvinceFilter(filters.FilterSet):
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")
     country__name = filters.CharFilter(field_name="country__name", lookup_expr="exact")
     country__id = filters.NumberFilter(field_name="country__id")
+    population__gte = filters.NumberFilter(field_name="population", lookup_expr="gte")
+    population__lte = filters.NumberFilter(field_name="population", lookup_expr="lte")
+    median_age__lte = filters.NumberFilter(field_name="median_age", lookup_expr="lte")
+    median_age__gte = filters.NumberFilter(field_name="median_age", lookup_expr="gte")
+
+    order = filters.OrderingFilter(
+        fields=[
+            ("name", "name"),
+            ("population", "population"),
+            ("median_age", "median_age"),
+        ]
+    )

@@ -20,7 +20,8 @@ export default function EditableTableRow(props) {
   const [editMode, setEditMode] = React.useState(false);
   const handleEditClick = () => {
     if (editMode) {
-      CountryService.patch({ id: data.id, params: data })
+      props.service
+        .patch({ id: data.id, params: data })
         .then((response) => {
           console.log(response);
         })
@@ -135,7 +136,7 @@ export default function EditableTableRow(props) {
               </TableCell>
             );
           })}
-        <TableCell component="div">
+        <TableCell component="div" align="right">
           <Button variant="contained" onClick={handleEditClick}>
             {!editMode ? <EditIcon /> : "Save"}
           </Button>

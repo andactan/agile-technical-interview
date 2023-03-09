@@ -45,3 +45,18 @@ class ProvinceView(AbstractView):
     permission_classes = [permissions.AllowAny]
     serializer_class = ProvinceSerializer
     filterset_class = ProvinceFilter
+
+    @decorators.action(detail=False, methods=["get"])
+    def export_to_csv(self, request, *args, **kwargs):
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="export.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(["id", "name", "continent", "population"])
+
+        # get filtered queryset, then export
+        filtered_qs = self.filterset_class(self.request.GET, self.get_queryset()).qs
+        for country in filtered_qs.values_list("id", "name", "population"):
+            writer.writerow(country)
+
+        return response
