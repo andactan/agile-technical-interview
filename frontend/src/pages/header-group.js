@@ -16,7 +16,6 @@ import AddIcon from "@mui/icons-material/Add";
 import React from "react";
 
 export default function HeaderGroup(props) {
-  console.log(props);
   return (
     <Paper sx={{ padding: "20px", marginBottom: "10px" }}>
       <Grid container spacing={1}>
@@ -29,7 +28,10 @@ export default function HeaderGroup(props) {
                 id="continent-select"
                 label="Continent"
                 value={props.continent}
-                onChange={(event) => props.setContinent(event.target.value)}
+                onChange={(event) => {
+                  props.setContinent(event.target.value);
+                  props.setPage(0);
+                }}
               >
                 <MenuItem value={"All"}>All</MenuItem>
                 {props.continents.map((continent) => (
@@ -50,7 +52,10 @@ export default function HeaderGroup(props) {
                 id="population-select"
                 label="Population"
                 value={props.population}
-                onChange={(event) => props.setPopulation(event.target.value)}
+                onChange={(event) => {
+                  props.setPopulation(event.target.value);
+                  props.setPage(0);
+                }}
               >
                 <MenuItem value={"All"}>All</MenuItem>
                 <MenuItem value={"population__lte-100000000"}>
@@ -75,7 +80,10 @@ export default function HeaderGroup(props) {
                 id="median-age-select"
                 label="Median Age"
                 value={props.medianAge}
-                onChange={(event) => props.setMedianAge(event.target.value)}
+                onChange={(event) => {
+                  props.setMedianAge(event.target.value);
+                  props.setPage(0);
+                }}
               >
                 <MenuItem value={"All"}>All</MenuItem>
                 <MenuItem value={"median_age__lte-45"}>{"< 45"}</MenuItem>
@@ -93,7 +101,10 @@ export default function HeaderGroup(props) {
                 id="fertility-rate-select"
                 label="Fertility Rate"
                 value={props.fertilityRate}
-                onChange={(event) => props.setFertilityRate(event.target.value)}
+                onChange={(event) => {
+                  props.setFertilityRate(event.target.value);
+                  props.setPage(0);
+                }}
               >
                 <MenuItem value={"All"}>All</MenuItem>
                 <MenuItem value={"fertility_rate__lte-1.5"}>{"< 1.5"}</MenuItem>

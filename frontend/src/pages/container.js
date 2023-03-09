@@ -27,15 +27,16 @@ function Create(props) {
   const [data, setData] = React.useState(protoData);
 
   const handleOnChange = (event, key) => {
-    const newData = { ...data, ...props.saveKwargs };
+    const newData = { ...data };
     newData[key] = event.target.value;
 
     setData({ ...newData });
   };
 
   const handleSaveClick = () => {
+    let params = { ...data, ...props.saveKwargs };
     props.service
-      .post({ params: data })
+      .post({ params: params })
       .then((response) => {
         console.log(response);
         props.setReload((reload) => !reload);
@@ -212,12 +213,13 @@ export default function Container(props) {
       .catch((error) => {
         console.log(error);
       });
-  }, [reload]);
+  }, [reload, props.service]);
 
   const [searchText, setSearchText] = React.useState("");
   const [name, setName] = React.useState("");
   const handleSearchClick = () => {
     setName(searchText);
+    setPage(0);
   };
 
   const handleExportButtonClick = () => {
@@ -248,6 +250,7 @@ export default function Container(props) {
     handleDeleteButtonClick: handleDeleteButtonClick,
     handleAddButtonClick: handleAddButtonClick,
     searchPlaceholder: props.searchPlaceholder,
+    setPage: setPage,
   };
 
   if (props.disableFilters) {
@@ -286,7 +289,7 @@ export default function Container(props) {
     }
 
     return params;
-  }, [name, continent, population, fertilityRate, medianAge]);
+  }, [name, continent, population, fertilityRate, medianAge, props.filterBy]);
 
   React.useEffect(() => {
     const _orderBy = orderBy.map((order) => {

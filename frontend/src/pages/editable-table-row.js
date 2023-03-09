@@ -9,7 +9,6 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import React from "react";
 import { Link } from "react-router-dom";
-import CountryService from "../services/country-service";
 
 export default function EditableTableRow(props) {
   const fields = props.fields;
